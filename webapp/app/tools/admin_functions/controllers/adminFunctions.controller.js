@@ -44,17 +44,17 @@ angular.module('app.tools').controller("AdminFunctionsController", function($sco
 
     $scope.changeRegionActiveTF = function(region){
         var region_id = region.id;
-        var newActiveTF  = !(region.activeTF)
+        var newIsActive  = !(region.is_active)
 
         var url = hostname + 'regions';
         var postParams = {
             region_id: region_id,
-            activeTF: newActiveTF
+            is_active: newIsActive
         }
 
         $scope.sessionService.authenticatedPost(url, postParams,
             (data)=>{
-                //alert(region_id + ' active flag changed to ' + newActiveTF + '!');
+                //alert(region_id + ' active flag changed to ' + newIsActive + '!');
                 // TODO refresh the scope
                 updateRegions();
                 $scope.regionService.updateRegionDropdown();

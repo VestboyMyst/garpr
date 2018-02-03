@@ -21,7 +21,7 @@
             <td>Merged On</td>
             <td></td>
         </tr>
-        <tr ng-repeat="merge in mergeService.mergeList.merges | filter:query">
+        <tr ng-repeat="merge in mergeService.mergeList.merges | filter:query | orderObjectBy:merge.time">
             <td><a href="#/{{regionService.region.id}}/players/{{merge.source_player_obj_id}}">{{merge.source_player_name}}</a></td>
             <td><a href="#/{{regionService.region.id}}/players/{{merge.target_player_obj_id}}">{{merge.target_player_name}}</a></td>
             <td>{{merge.requester_user_id}}</td>

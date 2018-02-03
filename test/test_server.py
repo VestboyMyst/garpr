@@ -199,7 +199,7 @@ class TestServer(unittest.TestCase):
                 'regions': [
                     {
                         'id': 'norcal', 
-                        'activeTF': True,
+                        'is_active': True,
                         'display_name': 'Norcal',
                         'ranking_num_tourneys_attended': 2,
                         'ranking_activity_day_limit': 60,
@@ -207,7 +207,7 @@ class TestServer(unittest.TestCase):
                     },
                     {
                         'id': 'texas', 
-                        'activeTF': True,
+                        'is_active': True,
                         'display_name': 'Texas',
                         'ranking_num_tourneys_attended': 2,
                         'ranking_activity_day_limit': 60,
@@ -223,7 +223,7 @@ class TestServer(unittest.TestCase):
     def test_change_region_active_flag(self, mock_admin_user):
         data = {
             'region_id': 'norcal',
-            'activeTF': 'false'
+            'is_active': 'false'
         }
 
         response = self.app.post('/regions', data=json.dumps(data), content_type='application/json')
