@@ -101,6 +101,11 @@ class Dao(object):
     def get_all_regions(cls, mongo_client, database_name=DATABASE_NAME):
         regions = [M.Region.load(r, context='db') for r in mongo_client[
             database_name][M.Region.collection_name].find()]
+        print regions
+        for region in regions:
+            print(str(region.region_ranking_criteria.ranking_num_tourneys_attended))
+            print(str(region.region_ranking_criteria.ranking_activity_day_limit))
+            print(str(region.region_ranking_criteria.tournament_qualified_day_limit))
         return sorted(regions, key=lambda r: r.display_name)
 
     def get_player_by_id(self, id):
@@ -268,6 +273,7 @@ class Dao(object):
         tournaments = [t for t in self.tournaments_col.find(
             query_dict).sort([('date', 1)])]
 
+        print tournaments
         return [M.Tournament.load(t, context='db') for t in tournaments]
 
     def get_tournament_by_id(self, id):
@@ -542,11 +548,12 @@ class Dao(object):
                                        tournament_qualified_day_limit):
         if self.regions_col.find_one({'_id': region_id}):
             self.regions_col.update({'_id': region_id},
-                                    {'$set':
-                                        {
-                                         'ranking_num_tourneys_attended': ranking_num_tourneys_attended,
-                                         'ranking_activity_day_limit': ranking_activity_day_limit,
-                                         'tournament_qualified_day_limit': tournament_qualified_day_limit
+                                    {'$set': {
+                                            'region_ranking_criteria': {
+                                                'ranking_num_tourneys_attended': ranking_num_tourneys_attended,
+                                                'ranking_activity_day_limit': ranking_activity_day_limit,
+                                                'tournament_qualified_day_limit': tournament_qualified_day_limit
+                                            }
                                         }
                                      })
 

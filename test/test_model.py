@@ -585,9 +585,9 @@ class TestRegion(unittest.TestCase):
         self.id = 'norcal'
         self.display_name = 'Norcal'
         self.activeTF = True
-        self.ranking_num_tourneys_attended=2
-        self.ranking_activity_day_limit=60
-        self.tournament_qualified_day_limit=999
+        self.region_ranking_criteria.ranking_num_tourneys_attended=2
+        self.region_ranking_criteria.ranking_activity_day_limit=60
+        self.region_ranking_criteria.tournament_qualified_day_limit=999
         self.region = Region(id=self.id, activeTF=self.activeTF, display_name=self.display_name,
                              ranking_num_tourneys_attended=self.ranking_num_tourneys_attended,
                              ranking_activity_day_limit=self.ranking_activity_day_limit,

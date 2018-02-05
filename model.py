@@ -335,16 +335,19 @@ class Ranking(orm.Document):
               ('time', orm.DateTimeField()),
               ('ranking', orm.ListField(orm.DocumentField(RankingEntry)))]
 
+class RegionRankingCriteria(orm.Document):
+    collection_name = None
+    fields = [('ranking_num_tourneys_attended', orm.IntField(required=True, default=2)),
+              ('ranking_activity_day_limit', orm.IntField(required=True, default=60)),
+              ('tournament_qualified_day_limit', orm.IntField(required=True, default=999))]
+
 class Region(orm.Document):
     collection_name = 'regions'
     fields = [('id', orm.StringField(required=True, load_from=MONGO_ID_SELECTOR,
                                      dump_to=MONGO_ID_SELECTOR)),
               ('display_name', orm.StringField(required=True)),
-              ('ranking_num_tourneys_attended', orm.IntField(required=True, default=2)),
-              ('ranking_activity_day_limit', orm.IntField(required=True, default=60)),
-              ('tournament_qualified_day_limit', orm.IntField(required=True, default=999)),
-              ('activeTF', orm.BooleanField(required=True, default=True))]
-
+              ('activeTF', orm.BooleanField(required=True, default=True)),
+              ('region_ranking_criteria', orm.DocumentField(RegionRankingCriteria))]
 
 class User(orm.Document):
     collection_name = 'users'
