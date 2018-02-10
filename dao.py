@@ -5,6 +5,7 @@ import hashlib
 import os
 import pymongo
 import re
+from itertools import groupby
 
 from config.config import Config
 
@@ -188,6 +189,40 @@ class Dao(object):
 
         player.name = name
         return self.update_player(player)
+
+    def get_all_player_tournaments_by_id(self, id):
+        result = self.players_col.find({"_id": id})
+        if result.count() == 0:
+            return None
+        tournaments = \
+            [ M.Tournament.load(t, context='db') for t in self.tournaments_col.find({'players': {'$in': [id] }}) ]
+        return tournaments
+
+    def sort_player_tournaments_by_region(self, id):
+        result = self.players_col.find({"_id": id})
+        if result.count() == 0:
+            return None
+        tournaments = self.get_all_player_tournaments_by_id(id)
+
+        region_count = {}
+        for tournament in tournaments:
+            if not tournament.regions[0]: pass
+
+            region = tournament.regions[0]
+            if region_count.get(region, None) is None:
+                region_count[region] = 0
+            region_count[region] = region_count[region] + 1
+
+        counts = []
+        for region, count in region_count.iteritems():
+            r = {
+                'name': region,
+                'count': count
+            }
+            counts.append(r)
+        counts = sorted(counts, key=lambda x: x['count'], reverse=True)
+        return counts
+
 
     def insert_pending_tournament(self, pending_tournament):
         return self.pending_tournaments_col.insert(pending_tournament.dump(context='db'))
@@ -566,7 +601,7 @@ class Dao(object):
         result = self.regions_col.find_one({'_id': region_id})
         if result:
             region = M.Region.load(result, context='db')
-            return region.dump(context='web')
+            return region.dump(context='web') 
 
     # throws an exception, which is okay because this is called from just create_user
     def insert_user(self, user):

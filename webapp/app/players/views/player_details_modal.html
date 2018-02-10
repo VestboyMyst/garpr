@@ -16,8 +16,16 @@
                                class="mobile"
                                ng-model="playerRegionCheckbox[regionId]"
                                ng-true-value="'IN_REGION'"
-                               ng-false-value="'NOT_IN_REGION'">
+                               >
                         {{regionService.getRegionDisplayNameFromRegionId(regionId)}}
+                    </label>
+                </h4>
+            </div>
+            <div class="checkbox" ng-class="{readonly: !isSuperAdmin}" ng-repeat="region in getRemainingRegions()">
+                <h4>
+                    <label>
+                        <input type="checkbox" ng-disabled="!isSuperAdmin" class="mobile">
+                        {{region.display_name}}
                     </label>
                 </h4>
             </div>

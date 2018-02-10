@@ -146,6 +146,20 @@ table{
     background-color: rgba(0, 0, 0, 0.3);
 }
 
+.player-region {
+    margin-left: 15px;
+    font-size: 16pt;
+    color: #777777;
+    transform: translateY(-30%);
+}
+
+.readonly {
+    opacity: .50;
+    font-style: italic;
+    filter: alpha(opacity=50);
+    cursor: auto;
+}
+
 
 
 /*END application-wide styling */

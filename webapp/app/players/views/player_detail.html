@@ -12,6 +12,11 @@
             <h2><em>This player has been merged into player <a href="#/{{regionService.region.id}}/players/{{player.merge_parent}}">{{mergeParent.name}}</a>.</em></h2>
         </div>
     </div>
+    <!-- Insert Player Region -->
+    <div class="row">
+        <!-- Will need to change the formatting if worldwide use is implemented -->
+        <p class="player-region">{{regionService.region.display_name}}</p>
+    </div>
     <div ng-show="!player.merged">
         <div class="row">
             <div class="player-rating col-md-12">
