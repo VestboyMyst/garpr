@@ -15,7 +15,7 @@
     <!-- Insert Player Region -->
     <div class="row">
         <!-- Will need to change the formatting if worldwide use is implemented -->
-        <p class="player-region">{{regionService.region.display_name}}</p>
+        <p class="player-region">{{ regionService.getRegionDisplayNameFromRegionId(player.regions[0]) }}</p>
     </div>
     <div ng-show="!player.merged">
         <div class="row">
