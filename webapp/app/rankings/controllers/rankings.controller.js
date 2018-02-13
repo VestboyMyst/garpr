@@ -1,8 +1,9 @@
-angular.module('app.rankings').controller("RankingsController", function($scope, $http, $routeParams, $uibModal, RegionService, RankingsService, SessionService) {
+angular.module('app.rankings').controller("RankingsController", function($scope, $http, $routeParams, $uibModal, TournamentService, RegionService, RankingsService, SessionService) {
     RegionService.setRegion($routeParams.region);
     $scope.regionService = RegionService;
-    $scope.rankingsService = RankingsService
-    $scope.sessionService = SessionService
+    $scope.rankingsService = RankingsService;
+    $scope.sessionService = SessionService;
+    $scope.tournamentService = TournamentService;
 
     $scope.modalInstance = null;
     $scope.disableButtons = false;
@@ -18,6 +19,15 @@ angular.module('app.rankings').controller("RankingsController", function($scope,
             size: 'lg'
         });
     };
+
+    $scope.getTournamentsInRange = function(){
+        var now = new Date(Date.now());
+
+        var then = new Date();
+        then.setDate(then.getDate() - $scope.rankingNumDaysBack);
+
+        $scope.rankingTournamentsList = $scope.tournamentService.getTournamentsInDateRange(now, then);
+    }
 
     $scope.confirm = function() {
         $scope.disableButtons = true;
@@ -48,7 +58,7 @@ angular.module('app.rankings').controller("RankingsController", function($scope,
             $scope.rankingNumDaysBack = res.data.ranking_criteria.ranking_activity_day_limit;
             $scope.rankingsNumTourneysAttended = res.data.ranking_criteria.ranking_num_tourneys_attended;
             $scope.tourneyNumDaysBack = res.data.ranking_criteria.tournament_qualified_day_limit;
-
+            
         },
         (err) => {
             alert('There was an error getting the Ranking Criteria for the region')
@@ -73,5 +83,5 @@ angular.module('app.rankings').controller("RankingsController", function($scope,
         });
     };
 
-    var rankingCriteria = $scope.getRegionRankingCriteria()
+    var rankingCriteria = $scope.getRegionRankingCriteria();
 });

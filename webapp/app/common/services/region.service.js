@@ -11,6 +11,7 @@ angular.module('app.common').service('RegionService', function ($http, PlayerSer
                     PlayerService.playerList = [];
                     TournamentService.tournamentList = [];
                     RankingsService.rankingsList = [];
+                    RankingsService.rankingsTournaments = [];
                     MergeService.mergeList = [];
                     service.populateDataForCurrentRegion();
                 });
@@ -38,6 +39,9 @@ angular.module('app.common').service('RegionService', function ($http, PlayerSer
             $http.get(hostname + this.region.id + '/rankings').
                 success(function(data) {
                     RankingsService.rankingsList = data;
+                    RankingsService.rankingsTournamentsIds = data.tournaments;
+                    RankingsService.rankingsTournaments = 
+                        TournamentService.getTournamentsByIds(RankingsService.rankingsTournamentsIds);
                 });
 
             this.populateLoggedInDataForCurrentRegion();
@@ -54,6 +58,8 @@ angular.module('app.common').service('RegionService', function ($http, PlayerSer
                         if(tournament.excluded == true)
                             TournamentService.excludedList.push(tournament);
                     })
+                    RankingsService.rankingsTournaments = 
+                        TournamentService.getTournamentsByIds(RankingsService.rankingsTournamentsIds);
                 });
 
             if(SessionService.loggedIn) {

@@ -10,6 +10,7 @@ import rating_calculators
 def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tournament_qualified_day_limit=999):
     player_date_map = {}
     player_id_to_player_map = {}
+    ranking_tournaments = []
 
     tournament_qualified_date = (now - timedelta(days=tournament_qualified_day_limit))
     print('Qualified Date: ' + str(tournament_qualified_date))
@@ -22,6 +23,8 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
             continue
 
         if tournament_qualified_date <= tournament.date:
+            ranking_tournaments.append(tournament)
+
             print 'Processing:', tournament.name.encode('utf-8'), str(tournament.date)
             for player_id in tournament.players:
                 player_date_map[player_id] = tournament.date
@@ -89,7 +92,7 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
         id=ObjectId(),
         region=dao.region_id,
         time=now,
-        tournaments=[t.id for t in tournaments],
+        tournaments=[t.id for t in ranking_tournaments],
         ranking=ranking))
 
     print 'Done!'
