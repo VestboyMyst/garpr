@@ -6,6 +6,10 @@ from flask.ext.restful import reqparse, abort
 
 from pymongo import MongoClient
 
+#Base logging config
+import logger
+import logging
+
 import re
 import sys
 
@@ -22,6 +26,7 @@ from scraper.smashgg import SmashGGScraper
 TYPEAHEAD_PLAYER_LIMIT = 20
 BASE_REGION = 'newjersey'
 
+logging.info('Beginning server...');
 
 # parse config file
 config = Config()
