@@ -9,6 +9,7 @@ from pymongo import MongoClient
 #Base logging config
 import logger
 import logging
+logger = logging.getLogger('garpr')
 
 import re
 import sys
@@ -33,6 +34,12 @@ config = Config()
 
 mongo_client = MongoClient(host=config.get_mongo_url())
 print "parsed config: ", config.get_mongo_url()
+
+# set logger level from config
+log_level = config.get_logging_level()
+print "log level is set to " + str(log_level)
+logger.setLevel(log_level)
+
 
 app = Flask(__name__)
 api = restful.Api(app)

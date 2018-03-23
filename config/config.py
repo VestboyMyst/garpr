@@ -1,5 +1,7 @@
 from ConfigParser import ConfigParser
 
+import logging
+
 DEFAULT_CONFIG_PATH = './config/config.ini'
 
 class Config(object):
@@ -73,3 +75,25 @@ class Config(object):
 
     def get_dropbox_access_token(self):
         return self.config.get('dropbox', 'access_token')
+
+    def get_logging_level(self):
+        lvl = self.config.get('logging', 'level')
+
+        # set default level to WARNING if invalid level
+        if lvl not in ('DEBUG', 'WARNING', 'INFO', 'CRITICAL', 'ERROR'):
+            print lvl + ' is not a valid level. Please use DEBUG, INFO, WARNING, ERROR, or CRITICAL'
+            logging.warning(lvl + ' is not a valid level. Please use DEBUG, INFO, WARNING, ERROR, or CRITICAL')
+            lvl = 'WARNING'
+
+        if lvl is 'DEBUG':
+            lvl = logging.DEBUG
+        elif lvl is 'INFO':
+            lvl = logging.INFO
+        elif lvl is 'WARNING':
+            lvl = logging.WARNING
+        elif lvl is 'ERROR':
+            lvl = logging.ERROR
+        elif lvl is 'CRITICAL':
+            lvl = logging.CRITICAL
+
+        return lvl

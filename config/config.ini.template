@@ -27,6 +27,9 @@ app_token=FB_APP_TOKEN
 [loaderio]
 token=LOADERIO_TOKEN
 
+[logging]
+level=LOG_LEVEL
+
 [dropbox]
 app_key=DROPBOX_APP_KEY
 app_secret=DROPBOX_APP_SECRET
