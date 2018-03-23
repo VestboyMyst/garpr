@@ -49,7 +49,7 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
                         print('match excluded:')
                         print('Tournament: ' + str(tournament.name))
                         print(str(match))
-                        logger.warning('Match excluded: ' + str(match) + ' Tournament: ' + str(tournament.name))
+                        logger.debug('Match excluded: ' + str(match) + ' Tournament: ' + str(tournament.name))
                         continue
 
                     logger.debug('Getting winner and loser')
@@ -87,7 +87,7 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
                     rating_calculators.update_trueskill_ratings(
                         dao.region_id, winner=winner, loser=loser)
             else:
-                logger.info('Tournament ' + str(tournament.name) + ' outside qualified date. Skipping.')
+                logger.debug('Tournament ' + str(tournament.name) + ' outside qualified date. Skipping.')
 
         print 'Checking for player inactivity...'
         logger.info('Checking for player inactivity...')
