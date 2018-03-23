@@ -57,12 +57,18 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
                     # don't count matches where either player is OOR
                     winner = dao.get_player_by_id(match.winner)
                     logger.debug('Winner: ' + str(winner))
-                    if dao.region_id not in winner.regions:
+                    if winner is None:
+                        logger.warning('Player found as NoneType. Skipping match')
+                        continue
+                    elif dao.region_id not in winner.regions:
                         continue
 
                     loser = dao.get_player_by_id(match.loser)
                     logger.debug('Loser: ' + str(loser))
-                    if dao.region_id not in loser.regions:
+                    if loser is None:
+                        logger.warning('Player found as NoneType. Skipping match')
+                        continue
+                    elif dao.region_id not in loser.regions:
                         continue
 
                     if match.winner not in player_id_to_player_map:
@@ -92,6 +98,10 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
             key=lambda player: trueskill.expose(player.ratings[dao.region_id].trueskill_rating()), reverse=True)
         ranking = []
         for player in sorted_players:
+            if player is None: 
+                logger.warning('NoneType player found while checking inactivity. Skipping.')
+                continue
+
             player_last_active_date = player_date_map.get(player.id)
             if player_last_active_date is None or \
                     dao.is_inactive(player, now, day_limit, num_tourneys) or \
@@ -108,6 +118,9 @@ def generate_ranking(dao, now=datetime.now(), day_limit=60, num_tourneys=2, tour
         print 'Updating players...'
         logger.info('Updating players...')
         for i, p in enumerate(players, start=1):
+            if p is None: 
+                logger.warning('NoneType player found while updating. Skipping.')
+                continue
             logger.debug('Updating player ' + p.name)
             dao.update_player(p)
             # TODO: log somewhere later
