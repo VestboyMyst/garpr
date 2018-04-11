@@ -208,7 +208,6 @@ angular.module('app.tournaments').controller("TournamentsController", function($
             document.getElementById('smashGGImportMessage').innerHTML = "Please choose the phases to include";
         }).
         error(function(data) {
-            $scope.postParams.data = ''
             document.getElementById('smashGGImportMessage').innerHTML = "Something went wrong. Please try again. " +
                 "\nIf the problem persists, please contact the Admins";
         });
