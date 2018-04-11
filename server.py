@@ -13,6 +13,7 @@ logger = logging.getLogger('garpr')
 
 import re
 import sys
+import traceback
 
 import alias_service
 import model as M
@@ -49,6 +50,12 @@ def err(error_message, status_code=400):
     # TODO: log error_message
     abort(status_code, description=error_message)
 
+def log_exception():
+    try:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        logger.error(exc_tb)
+    except Exception as e:
+        traceback.print_exc(file='garpr.unknown.error')
 
 def get_dao(region):
     dao = Dao(region, mongo_client=mongo_client)
@@ -111,7 +118,8 @@ class RegionListResource(restful.Resource):
         try:
             dao.update_region_activeTF(region_id, activeTF)
             return 200
-        except:
+        except Exception as e: 
+            log_exception()
             return 'Error', 400
 
 
@@ -211,7 +219,8 @@ class PlayerResource(restful.Resource):
         player = None
         try:
             player = dao.get_player_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if not player:
             err('Player not found')
@@ -225,7 +234,8 @@ class PlayerResource(restful.Resource):
         player = None
         try:
             player = dao.get_player_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if not player:
             err('No player found with that region/id.')
@@ -269,7 +279,8 @@ class PlayerTournamentResource(restful.Resource):
                 tournaments.append(t)
 
             return tournaments
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             print e
             return 400
 
@@ -280,8 +291,8 @@ class PlayerSortedTournamentResource(restful.Resource):
         try:
             region_sorted_tournament_counts = dao.sort_player_tournaments_by_region(ObjectId(id))
             return region_sorted_tournament_counts
-        except Exception as e:
-            import traceback
+        except Exception as e: 
+            log_exception()
             traceback.print_exc(file=sys.stdout)
             print 'errrrrrrrror'
             print e
@@ -354,7 +365,8 @@ class TournamentListResource(restful.Resource):
                 all_tournament_jsons.append(t.dump(context='web',
                                                    only=only_properties))
 
-            except:
+            except Exception as e: 
+                log_exception()
                 print 'error inserting tournament', t
 
         if args['includePending'] == 'true':
@@ -370,7 +382,8 @@ class TournamentListResource(restful.Resource):
                                    only=only_properties)
                         p['pending'] = True
                         all_tournament_jsons.append(p)
-                    except:
+                    except Exception as e: 
+                        log_exception()
                         print 'error inserting pending tournament', p
 
         return_dict = {}
@@ -428,7 +441,8 @@ class TournamentListResource(restful.Resource):
         try:
             pending_tournament.alias_to_id_map = alias_service.get_alias_to_id_map_in_list_format(
                 dao, pending_tournament.players)
-        except:
+        except Exception as e: 
+            log_exception()
             err('Alias service encountered an error')
 
         # If the tournament is too large, don't insert the raw file into the db.
@@ -484,7 +498,8 @@ class TournamentResource(restful.Resource):
         tournament = None
         try:
             tournament = dao.get_tournament_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if tournament is not None:
             response = convert_tournament_to_response(tournament, dao)
@@ -518,7 +533,8 @@ class TournamentResource(restful.Resource):
                 tournament = dao.get_pending_tournament_by_id(ObjectId(id))
             else:
                 tournament = dao.get_tournament_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if not tournament:
             err("No tournament found with that id.")
@@ -530,7 +546,8 @@ class TournamentResource(restful.Resource):
                 try:
                     tournament.date = datetime.strptime(
                         args['date'].strip(), '%m/%d/%y')
-                except:
+                except Exception as e: 
+                    log_exception()
                     err("Invalid date format")
             if args['players']:
                 # this should rarely be used (if it is used, players will not
@@ -556,7 +573,8 @@ class TournamentResource(restful.Resource):
                     if not isinstance(p, unicode):
                         err("each region must be a string")
                 tournament.regions = args['regions']
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
 
         try:
@@ -565,7 +583,8 @@ class TournamentResource(restful.Resource):
             else:
                 print tournament
                 dao.update_tournament(tournament)
-        except:
+        except Exception as e: 
+            log_exception()
             err('Update Tournament Error')
 
         if args['pending']:
@@ -586,7 +605,8 @@ class TournamentResource(restful.Resource):
         try:
             tournament_to_delete = dao.get_pending_tournament_by_id(
                 ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if tournament_to_delete:  # its a pending tournament
             if not is_user_admin_for_regions(
@@ -622,7 +642,8 @@ class TournamentResource(restful.Resource):
         try:
             dao.set_tournament_exclusion_by_tournament_id(ObjectId(id), excluded)
             return 200
-        except:
+        except Exception as e: 
+            log_exception()
             return 'Error', 400
 
 
@@ -647,7 +668,8 @@ class PendingTournamentResource(restful.Resource):
         pending_tournament = None
         try:
             pending_tournament = dao.get_pending_tournament_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if not pending_tournament:
             err("No pending tournament found with that id.")
@@ -666,14 +688,16 @@ class PendingTournamentResource(restful.Resource):
                 player_id = alias_item.player_id
                 pending_tournament.set_alias_id_mapping(
                     player_alias, player_id)
-        except:
+        except Exception as e: 
+            log_exception()
             print 'Error processing alias_to_id map'
             err('Error processing alias_to_id map')
 
         try:
             dao.update_pending_tournament(pending_tournament)
             return pending_tournament.dump(context='web')
-        except:
+        except Exception as e: 
+            log_exception()
             err('Encountered an error inserting pending tournament')
 
 
@@ -688,7 +712,8 @@ class FinalizeTournamentResource(restful.Resource):
         pending_tournament = None
         try:
             pending_tournament = dao.get_pending_tournament_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Invalid ObjectID')
         if not pending_tournament:
             err('No pending tournament found with that id.')
@@ -712,7 +737,8 @@ class FinalizeTournamentResource(restful.Resource):
                 player = dao.get_player_by_id(player_id)
                 if player.merged:
                     err('Player {} has already been merged'.format(player.name))
-            except:
+            except Exception as e: 
+                log_exception()
                 err('Not all player ids are valid')
 
         try:
@@ -725,7 +751,8 @@ class FinalizeTournamentResource(restful.Resource):
         except ValueError as e:
             print e
             err('Not all player aliases in this pending tournament have been mapped to player ids.')
-        except:
+        except Exception as e: 
+            log_exception()
             err('Dao threw an error somewhere')
 
 
@@ -760,7 +787,8 @@ class AddTournamentMatchResource(restful.Resource):
         try:
             dao.add_match_by_tournament_id(
                 ObjectId(id), ObjectId(winner_id), ObjectId(loser_id))
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             print 'error adding match to tournament: ' + str(e)
             err('error adding match to tournament: ' + str(e))
 
@@ -782,7 +810,8 @@ class ExcludeTournamentMatchResource(restful.Resource):
         args = parser.parse_args()
         try:
             tournament = dao.get_tournament_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
             err('Casting error')
 
         if not is_user_admin_for_regions(user, tournament.regions):
@@ -794,7 +823,8 @@ class ExcludeTournamentMatchResource(restful.Resource):
         try:
             dao.set_match_exclusion_by_tournament_id_and_match_id(
                 ObjectId(id), match_id, excluded)
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             print e
             err('Match exclusion failed')
 
@@ -825,7 +855,8 @@ class SwapWinnerLoserMatchResource(restful.Resource):
         try:
             dao.swap_winner_loser_by_tournament_id_and_match_id(
                 ObjectId(tournament_id), match_id)
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             err('Swap Winner Loser failed: ' + str(e))
 
 
@@ -871,7 +902,8 @@ class RankingsResource(restful.Resource):
                 args['ranking_activity_day_limit'])
             tournament_qualified_day_limit = int(
                 args['tournament_qualified_day_limit'])
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             err('Error parsing Ranking Criteria, please try again: ' + str(e))
 
         print ranking_num_tourneys_attended
@@ -883,7 +915,8 @@ class RankingsResource(restful.Resource):
                                                ranking_num_tourneys_attended=ranking_num_tourneys_attended,
                                                ranking_activity_day_limit=ranking_activity_day_limit,
                                                tournament_qualified_day_limit=tournament_qualified_day_limit)
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             err('There was an error updating the region rankings criteria:' + str(e))
 
         return dao.get_region_ranking_criteria(region)
@@ -926,9 +959,11 @@ class RankingsResource(restful.Resource):
                                           day_limit=ranking_activity_day_limit,
                                           num_tourneys=ranking_num_tourneys_attended,
                                           tournament_qualified_day_limit=tournament_qualified_day_limit)
-            except:
+            except Exception as e: 
+                log_exception()
                 rankings.generate_ranking(dao, now=now)
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             print str(e)
             err('There was an error updating rankings')
 
@@ -949,7 +984,9 @@ class MatchesResource(restful.Resource):
         player = None
         try:
             player = dao.get_player_by_id(ObjectId(id))
-        except:
+        except Exception as e: 
+            log_exception()
+            logger.error(e)
             err('Invalid ObjectID')
 
         return_dict['player'] = {'id': str(player.id), 'name': player.name}
@@ -962,7 +999,8 @@ class MatchesResource(restful.Resource):
                 return_dict['opponent'] = {
                     'id': str(opponent.id), 'name': opponent.name}
                 player_list.append(opponent)
-            except:
+            except Exception as e: 
+                log_exception()
                 err('Invalid ObjectID')
 
         match_list = []
@@ -997,7 +1035,8 @@ class MatchesResource(restful.Resource):
                     try:
                         match_dict['opponent_name'] = dao.get_player_by_id(
                             ObjectId(match_dict['opponent_id'])).name
-                    except:
+                    except Exception as e: 
+                        log_exception()
                         err('Invalid ObjectID')
 
                     if tournament.date >= (now - timedelta(day_limit)):
@@ -1071,7 +1110,8 @@ class MergeListResource(restful.Resource):
             print args
             source_player_id = ObjectId(args['source_player_id'])
             target_player_id = ObjectId(args['target_player_id'])
-        except:
+        except Exception as e: 
+            log_exception()
             err('invalid ids')
         # the above should validate that we have real objectIDs
         # now lets validate that both of those players exist
@@ -1098,7 +1138,8 @@ class MergeListResource(restful.Resource):
             dao.insert_merge(the_merge)
             return_dict = {'status': "success", 'id': str(the_merge.id)}
             return return_dict, 200
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             err('error merging players: ' + str(e))
 
 
@@ -1114,13 +1155,15 @@ class MergeResource(restful.Resource):
 
         try:
             merge_id = ObjectId(id)
-        except:
+        except Exception as e: 
+            log_exception()
             err('invalid ids')
 
         try:
             the_merge = dao.get_merge(merge_id)
             dao.undo_merge(the_merge)
-        except Exception as e:
+        except Exception as e: 
+            log_exception()
             err('error merging players: ' + str(e))
 
 
@@ -1232,8 +1275,9 @@ class AdminFunctionsResource(restful.Resource):
             try:
                 dao.create_user(uname, upass, uregions, uperm)
                 print("user created:" + uname)
-            except Exception as e:
+            except Exception as e: 
                 print e
+                log_exception()
                 err('Error creating user!')
 
 
