@@ -53,7 +53,7 @@ def err(error_message, status_code=400):
 def log_exception():
     try:
         exc_type, exc_value, exc_tb = sys.exc_info()
-        logger.error(exc_tb)
+        logger.error(str(exc_tb))
     except Exception as e:
         traceback.print_exc(file='garpr.unknown.error')
 
