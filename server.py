@@ -1038,7 +1038,9 @@ class MatchesResource(restful.Resource):
                             ObjectId(match_dict['opponent_id'])).name
                     except Exception as e: 
                         log_exception()
-                        err('Invalid ObjectID')
+                        continue
+                        #err('Invalid ObjectID')
+                        
 
                     if tournament.date >= (now - timedelta(day_limit)):
                         qualifying_tournaments.add(tournament.id)
