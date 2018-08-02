@@ -8,7 +8,7 @@ ExecStart=/usr/local/bin/twistd \
     --logfile="logs/webapp.log" \
     -oy webapp/serve_webapp.tac
 
-WorkingDirectory=/srv/garpr/prod
+WorkingDirectory=/srv/garpr/stage
 
 User=root
 Group=root
